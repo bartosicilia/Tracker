@@ -3,193 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker de Amigos</title>
+    <title>Tracker de Amigos Pro</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 15px; background-color: #f0f2f5; color: #333; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #1a1a1a; font-size: 24px; margin-bottom: 20px; }
-        h2 { font-size: 18px; margin-top: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 10px; background-color: #f0f2f5; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1a1a1a; font-size: 22px; margin-bottom: 15px; }
+        h2 { font-size: 18px; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 8px;}
         
-        .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-nav { flex: 1; padding: 12px; background: #e9ecef; border: none; border-radius: 8px; font-weight: bold; color: #495057; cursor: pointer; }
+        /* Navegación */
+        .nav-buttons { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .btn-nav { flex: 1; min-width: 80px; padding: 10px 5px; background: #e9ecef; border: none; border-radius: 8px; font-weight: bold; font-size: 13px; color: #495057; cursor: pointer; text-align: center; }
         .btn-nav.active { background: #000; color: #fff; }
         
-        .card { border: 1px solid #eaeaea; padding: 15px; margin-bottom: 15px; border-radius: 10px; background: #fafafa; }
-        .pendiente { border-left: 6px solid #f59e0b; }
-        .oficial { border-left: 6px solid #10b981; }
-        .badge { font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 12px; }
+        /* Tarjetas Historial */
+        .card { border: 1px solid #eaeaea; padding: 12px; margin-bottom: 12px; border-radius: 10px; background: #fafafa; }
+        .pendiente { border-left: 5px solid #f59e0b; }
+        .oficial { border-left: 5px solid #10b981; }
+        .badge { font-size: 11px; font-weight: bold; padding: 3px 6px; border-radius: 10px; }
         .badge.pend { background: #fef3c7; color: #92400e; }
         .badge.ofic { background: #d1fae5; color: #065f46; }
         
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        select, input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        /* Formularios */
+        .input-group { margin-bottom: 12px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555;}
+        select, input[type="password"], input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; background: #fff; }
         
-        .checkbox-group { display: flex; flex-direction: column; gap: 8px; background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 16px;}
-        .checkbox-item input { width: 20px; height: 20px; }
+        .flex-row { display: flex; gap: 10px; }
+        .flex-row > div { flex: 1; }
 
-        .btn-primary { background-color: #007bff; color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        /* Checkboxes Dudo */
+        .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+        .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 15px; padding: 8px; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;}
+        .checkbox-item input { width: 18px; height: 18px; }
+
+        /* Botones Acción */
+        .btn-primary { background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; margin-top: 5px; }
         .btn-primary:hover { background-color: #0056b3; }
+        .btn-danger { background-color: #dc3545; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px;}
         
-        .firma-box { background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffe69c; }
-        .firma-row { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
-        .btn-firmar { background: #198754; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;}
+        /* Cajas de estado */
+        .firma-box { background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #ffe69c; }
+        .firma-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+        .btn-firmar { background: #198754; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;}
         
-        .hidden { display: none; }
+        .stats-box { background: #e0f2fe; border: 1px solid #bae6fd; padding: 15px; border-radius: 8px; text-align: center; margin-top: 15px; }
+        .stats-number { font-size: 32px; font-weight: bold; color: #0284c7; margin: 10px 0; }
+        
+        .hidden { display: none !important; }
+        .empty-state { text-align: center; padding: 20px; color: #6c757d; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🏆 Liga de Amigos</h1>
+    <h1>🏆 Tracker Pro</h1>
     
     <div class="nav-buttons">
         <button class="btn-nav active" id="btn-feed" onclick="mostrarSeccion('feed')">Historial</button>
-        <button class="btn-nav" id="btn-nueva" onclick="mostrarSeccion('nueva-partida')">+ Cargar</button>
+        <button class="btn-nav" id="btn-nueva" onclick="mostrarSeccion('nueva-partida')">Cargar</button>
+        <button class="btn-nav" id="btn-comparar" onclick="mostrarSeccion('comparar')">Comparar</button>
+        <button class="btn-nav" id="btn-jugadores" onclick="mostrarSeccion('jugadores')">Jugadores</button>
     </div>
 
+    <!-- 1. SECCIÓN: Historial -->
     <div id="feed" class="seccion">
         <div id="lista-partidas">Cargando...</div>
     </div>
 
+    <!-- 2. SECCIÓN: Cargar Partida -->
     <div id="nueva-partida" class="seccion hidden">
         <h2>Registrar Partido</h2>
         
         <div class="input-group">
             <label>Juego</label>
-            <select id="juego-select">
-                <option value="Dudo">Dudo (Dados)</option>
+            <select id="juego-select" onchange="actualizarFormularioJuego()">
                 <option value="Truco">Truco</option>
                 <option value="Beer Pong">Beer Pong</option>
+                <option value="Dudo">Dudo (Dados)</option>
+            </select>
+        </div>
+
+        <!-- Controles dinámicos para Truco/Beer Pong -->
+        <div id="config-equipos" class="input-group">
+            <label>Formato (Jugadores por equipo)</label>
+            <select id="formato-select" onchange="actualizarFormularioJuego()">
+                <option value="1">1 vs 1</option>
+                <option value="2">2 vs 2</option>
+                <option value="3">3 vs 3</option>
             </select>
         </div>
 
         <div class="input-group">
-            <label>¿Quién carga esto? (Tu usuario)</label>
+            <label>¿Quién carga esto? (Tu usuario, ya firma por vos)</label>
             <select id="creador-select"></select>
         </div>
 
-        <div class="input-group">
-            <label>👑 Ganador (Elegí 1)</label>
-            <select id="ganador-select"></select>
+        <!-- Equipo Ganador -->
+        <div class="input-group" style="border-color: #10b981; background: #f0fdf4;">
+            <label style="color: #047857;">👑 Ganador/es</label>
+            <div id="ganadores-container"></div>
+            <div id="puntaje-ganador-container" style="margin-top: 10px;">
+                <label>Puntos Finales</label>
+                <input type="number" id="puntaje-ganador" placeholder="Ej: 30">
+            </div>
         </div>
         
-        <div class="input-group">
-            <label>❌ Perdedores (Seleccioná varios)</label>
-            <div class="checkbox-group" id="perdedores-container">
+        <!-- Equipo Perdedor -->
+        <div class="input-group" style="border-color: #ef4444; background: #fef2f2;">
+            <label style="color: #b91c1c;">❌ Perdedor/es</label>
+            <div id="perdedores-container"></div>
+            <div id="puntaje-perdedor-container" style="margin-top: 10px;">
+                <label>Puntos Finales</label>
+                <input type="number" id="puntaje-perdedor" placeholder="Ej: 23">
             </div>
         </div>
 
         <button class="btn-primary" onclick="guardarPartida()">Guardar Resultado</button>
     </div>
+
+    <!-- 3. SECCIÓN: Comparar -->
+    <div id="comparar" class="seccion hidden">
+        <h2>Frente a Frente</h2>
+        
+        <div class="flex-row">
+            <div class="input-group">
+                <label>Jugador 1</label>
+                <select id="comp-j1" onchange="calcularEstadisticas()"></select>
+            </div>
+            <div class="input-group">
+                <label>Jugador 2</label>
+                <select id="comp-j2" onchange="calcularEstadisticas()"></select>
+            </div>
+        </div>
+
+        <div id="resultados-estadisticas">
+            <div class="empty-state">Seleccioná dos jugadores distintos para ver su historial directo.</div>
+        </div>
+    </div>
+
+    <!-- 4. SECCIÓN: Jugadores -->
+    <div id="jugadores" class="seccion hidden">
+        <h2>Gestión de Jugadores</h2>
+        
+        <div class="input-group">
+            <label>Nombre del Jugador</label>
+            <input type="text" id="nuevo-jugador-nombre" placeholder="Ej: Barto">
+            
+            <label style="margin-top: 10px;">Establecer PIN (Contraseña)</label>
+            <input type="password" id="nuevo-jugador-pin" placeholder="Mínimo 4 caracteres">
+            
+            <button class="btn-primary" onclick="crearJugador()">Agregar Jugador</button>
+        </div>
+
+        <h3>Jugadores Creados</h3>
+        <div id="lista-jugadores"></div>
+    </div>
 </div>
 
 <script>
-    const JUGADORES_DEFAULT = [
-        { id: '1', nombre: 'Barto', pin: '1234' },
-        { id: '2', nombre: 'Franco', pin: '1234' },
-        { id: '3', nombre: 'Segundo', pin: '1234' }
-    ];
+    // 1. INICIALIZACIÓN DE DATOS (Arranca vacío)
+    if (!localStorage.getItem('jugadores_v2')) { localStorage.setItem('jugadores_v2', JSON.stringify([])); }
+    if (!localStorage.getItem('partidas_v2')) { localStorage.setItem('partidas_v2', JSON.stringify([])); }
 
-    if (!localStorage.getItem('jugadores')) {
-        localStorage.setItem('jugadores', JSON.stringify(JUGADORES_DEFAULT));
-    }
-    if (!localStorage.getItem('partidas')) {
-        localStorage.setItem('partidas', JSON.stringify([]));
-    }
+    function getJugadores() { return JSON.parse(localStorage.getItem('jugadores_v2')) || []; }
+    function getPartidas() { return JSON.parse(localStorage.getItem('partidas_v2')) || []; }
 
-    const jugadores = JSON.parse(localStorage.getItem('jugadores'));
-
+    // 2. NAVEGACIÓN
     function mostrarSeccion(id) {
         document.querySelectorAll('.seccion').forEach(el => el.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
         
-        document.getElementById('btn-feed').classList.remove('active');
-        document.getElementById('btn-nueva').classList.remove('active');
+        document.querySelectorAll('.btn-nav').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${id}`).classList.add('active');
         
-        if(id === 'feed') {
-            document.getElementById('btn-feed').classList.add('active');
-            cargarPartidas();
-        } else {
-            document.getElementById('btn-nueva').classList.add('active');
-        }
+        if (id === 'feed') cargarFeed();
+        if (id === 'nueva-partida') actualizarFormularioJuego();
+        if (id === 'jugadores') renderizarListaJugadores();
+        if (id === 'comparar') actualizarSelectsComparacion();
     }
 
-    function iniciarFormulario() {
+    // 3. LÓGICA DE JUGADORES
+    function crearJugador() {
+        const nombre = document.getElementById('nuevo-jugador-nombre').value.trim();
+        const pin = document.getElementById('nuevo-jugador-pin').value.trim();
+
+        if (!nombre || pin.length < 3) {
+            alert("Ingresá un nombre válido y un PIN de al menos 3 caracteres.");
+            return;
+        }
+
+        const jugadores = getJugadores();
+        if (jugadores.some(j => j.nombre.toLowerCase() === nombre.toLowerCase())) {
+            alert("Ese nombre ya existe.");
+            return;
+        }
+
+        jugadores.push({ id: 'j_' + Date.now(), nombre: nombre, pin: pin });
+        localStorage.setItem('jugadores_v2', JSON.stringify(jugadores));
+        
+        document.getElementById('nuevo-jugador-nombre').value = '';
+        document.getElementById('nuevo-jugador-pin').value = '';
+        
+        renderizarListaJugadores();
+        actualizarTodosLosSelects();
+        alert("Jugador creado exitosamente.");
+    }
+
+    function renderizarListaJugadores() {
+        const jugadores = getJugadores();
+        const div = document.getElementById('lista-jugadores');
+        if (jugadores.length === 0) {
+            div.innerHTML = "<div class='empty-state'>No hay jugadores. Creá el primero arriba.</div>";
+            return;
+        }
+        
+        div.innerHTML = jugadores.map(j => `
+            <div class="card" style="padding: 10px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                <strong>${j.nombre}</strong>
+            </div>
+        `).join('');
+    }
+
+    // Actualiza todos los menús desplegables de la app con los jugadores actuales
+    function actualizarTodosLosSelects() {
+        const jugadores = getJugadores();
+        let options = '<option value="">Seleccionar...</option>';
+        jugadores.forEach(j => { options += `<option value="${j.id}">${j.nombre}</option>`; });
+        
         const creadorSelect = document.getElementById('creador-select');
-        const ganadorSelect = document.getElementById('ganador-select');
-        const perdedoresContainer = document.getElementById('perdedores-container');
+        if(creadorSelect) {
+            const val = creadorSelect.value;
+            creadorSelect.innerHTML = options;
+            creadorSelect.value = val;
+        }
+        actualizarSelectsComparacion();
+    }
 
-        let options = '';
-        let checkboxes = '';
+    // 4. LÓGICA DEL FORMULARIO DE PARTIDAS (DINÁMICO)
+    function actualizarFormularioJuego() {
+        const juego = document.getElementById('juego-select').value;
+        const configEquipos = document.getElementById('config-equipos');
+        const contGanadores = document.getElementById('ganadores-container');
+        const contPerdedores = document.getElementById('perdedores-container');
+        const puntGanador = document.getElementById('puntaje-ganador-container');
+        const puntPerdedor = document.getElementById('puntaje-perdedor-container');
+        
+        const jugadores = getJugadores();
+        if(jugadores.length === 0) {
+            contGanadores.innerHTML = "<p style='font-size:12px;'>Creá jugadores primero.</p>";
+            contPerdedores.innerHTML = "";
+            return;
+        }
 
-        jugadores.forEach(j => {
-            options += `<option value="${j.id}">${j.nombre}</option>`;
-            checkboxes += `<label class="checkbox-item"><input type="checkbox" value="${j.id}" class="chk-perdedor"> ${j.nombre}</label>`;
-        });
+        let options = '<option value="">Elegir jugador...</option>';
+        jugadores.forEach(j => { options += `<option value="${j.id}">${j.nombre}</option>`; });
 
-        creadorSelect.innerHTML = options;
-        ganadorSelect.innerHTML = options;
-        perdedoresContainer.innerHTML = checkboxes;
+        if (juego === 'Dudo') {
+            configEquipos.classList.add('hidden');
+            puntGanador.classList.add('hidden');
+            puntPerdedor.classList.add('hidden');
+            
+            contGanadores.innerHTML = `<select class="sel-ganador">${options}</select>`;
+            
+            let checkboxes = '<div class="checkbox-group">';
+            jugadores.forEach(j => {
+                checkboxes += `<label class="checkbox-item"><input type="checkbox" value="${j.id}" class="chk-perdedor"> ${j.nombre}</label>`;
+            });
+            checkboxes += '</div>';
+            contPerdedores.innerHTML = checkboxes;
+        } else {
+            // Truco o Beer Pong
+            configEquipos.classList.remove('hidden');
+            puntGanador.classList.remove('hidden');
+            puntPerdedor.classList.remove('hidden');
+            
+            const formato = parseInt(document.getElementById('formato-select').value);
+            
+            let htmlGanadores = '';
+            let htmlPerdedores = '';
+            for(let i=0; i<formato; i++) {
+                htmlGanadores += `<select class="sel-ganador" style="margin-bottom:5px;">${options}</select>`;
+                htmlPerdedores += `<select class="sel-perdedor" style="margin-bottom:5px;">${options}</select>`;
+            }
+            contGanadores.innerHTML = htmlGanadores;
+            contPerdedores.innerHTML = htmlPerdedores;
+        }
     }
 
     function guardarPartida() {
         const juego = document.getElementById('juego-select').value;
         const creadorId = document.getElementById('creador-select').value;
-        const ganadorId = document.getElementById('ganador-select').value;
         
-        const perdedoresInputs = document.querySelectorAll('.chk-perdedor:checked');
-        const perdedoresIds = Array.from(perdedoresInputs).map(chk => chk.value);
+        if(!creadorId) { alert("Tenés que indicar quién está cargando la partida."); return; }
 
-        if (perdedoresIds.length === 0) {
-            alert("Tenés que seleccionar al menos un perdedor.");
+        let ganadoresIds = [];
+        let perdedoresIds = [];
+        let pGanador = null;
+        let pPerdedor = null;
+
+        if (juego === 'Dudo') {
+            ganadoresIds.push(document.querySelector('.sel-ganador').value);
+            const chks = document.querySelectorAll('.chk-perdedor:checked');
+            perdedoresIds = Array.from(chks).map(chk => chk.value);
+        } else {
+            const selectsGanadores = document.querySelectorAll('.sel-ganador');
+            const selectsPerdedores = document.querySelectorAll('.sel-perdedor');
+            selectsGanadores.forEach(s => { if(s.value) ganadoresIds.push(s.value); });
+            selectsPerdedores.forEach(s => { if(s.value) perdedoresIds.push(s.value); });
+            
+            pGanador = document.getElementById('puntaje-ganador').value;
+            pPerdedor = document.getElementById('puntaje-perdedor').value;
+        }
+
+        if (ganadoresIds.includes("") || ganadoresIds.length === 0) { alert("Falta seleccionar ganadores."); return; }
+        if (perdedoresIds.length === 0) { alert("Falta seleccionar perdedores."); return; }
+
+        // Chequear duplicados
+        const todos = [...ganadoresIds, ...perdedoresIds];
+        const unicos = new Set(todos);
+        if(todos.length !== unicos.size) {
+            alert("Un jugador no puede estar en ambos equipos o repetido.");
             return;
         }
-        if (perdedoresIds.includes(ganadorId)) {
-            alert("El ganador no puede estar marcado también como perdedor.");
-            return;
-        }
 
+        // Armar objeto
         const nuevaPartida = {
-            id: 'partida_' + Date.now(),
+            id: 'p_' + Date.now(),
             juego: juego,
             creador_id: creadorId,
             fecha: new Date().toISOString(),
             estado: 'pendiente',
+            puntaje_ganador: pGanador,
+            puntaje_perdedor: pPerdedor,
             resultados: []
         };
 
-        nuevaPartida.resultados.push({
-            jugador_id: ganadorId,
-            es_ganador: true,
-            firma_verificada: (ganadorId === creadorId)
+        ganadoresIds.forEach(id => {
+            nuevaPartida.resultados.push({ jugador_id: id, es_ganador: true, firma_verificada: (id === creadorId) });
+        });
+        perdedoresIds.forEach(id => {
+            nuevaPartida.resultados.push({ jugador_id: id, es_ganador: false, firma_verificada: (id === creadorId) });
         });
 
-        perdedoresIds.forEach(pId => {
-            nuevaPartida.resultados.push({
-                jugador_id: pId,
-                es_ganador: false,
-                firma_verificada: (pId === creadorId)
-            });
-        });
-
-        const partidas = JSON.parse(localStorage.getItem('partidas'));
+        const partidas = getPartidas();
         partidas.push(nuevaPartida);
-        localStorage.setItem('partidas', JSON.stringify(partidas));
+        localStorage.setItem('partidas_v2', JSON.stringify(partidas));
 
-        document.querySelectorAll('.chk-perdedor').forEach(chk => chk.checked = false);
-
-        alert("¡Partida registrada! Pasale el celu a los demás para que firmen.");
+        alert("¡Partida registrada! Avisale a los demás que firmen.");
+        document.getElementById('puntaje-ganador').value = '';
+        document.getElementById('puntaje-perdedor').value = '';
         mostrarSeccion('feed');
     }
 
-    function cargarPartidas() {
-        const partidas = JSON.parse(localStorage.getItem('partidas'));
+    // 5. RENDERIZAR HISTORIAL
+    function obtenerNombre(id) {
+        const j = getJugadores().find(j => j.id === id);
+        return j ? j.nombre : 'Eliminado';
+    }
+
+    function cargarFeed() {
+        const partidas = getPartidas();
         const divLista = document.getElementById('lista-partidas');
         
         if (partidas.length === 0) {
-            divLista.innerHTML = "<p style='text-align:center; color:gray;'>No hay partidas todavía. ¡Vayan a jugar!</p>";
+            divLista.innerHTML = "<div class='empty-state'>No hay partidas todavía. ¡Vayan a jugar!</div>";
             return;
         }
 
@@ -197,79 +374,154 @@
 
         let html = "";
         partidas.forEach(p => {
-            const fechaStr = new Date(p.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+            const fechaStr = new Date(p.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit' });
             const claseEstado = p.estado === 'oficial' ? 'oficial' : 'pendiente';
             const badgeClase = p.estado === 'oficial' ? 'ofic' : 'pend';
             
             const ganadoresNombres = p.resultados.filter(r => r.es_ganador).map(r => obtenerNombre(r.jugador_id)).join(', ');
             const perdedoresNombres = p.resultados.filter(r => !r.es_ganador).map(r => obtenerNombre(r.jugador_id)).join(', ');
+            
+            let textoPuntos = "";
+            if (p.puntaje_ganador && p.puntaje_perdedor) {
+                textoPuntos = `<div style="background:#eee; text-align:center; padding: 5px; border-radius: 6px; font-weight:bold; margin: 10px 0;">Resultado: ${p.puntaje_ganador} a ${p.puntaje_perdedor}</div>`;
+            }
+
             const firmasFaltantes = p.resultados.filter(r => !r.firma_verificada);
 
             html += `
                 <div class="card ${claseEstado}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <strong style="font-size: 18px;">${p.juego}</strong>
-                        <div>
-                            <span style="font-size: 12px; color: gray; margin-right: 5px;">${fechaStr}</span>
+                        <strong style="font-size: 16px;">${p.juego}</strong>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: gray; margin-bottom: 4px;">${fechaStr}</div>
                             <span class="badge ${badgeClase}">${p.estado.toUpperCase()}</span>
                         </div>
                     </div>
-                    <p style="margin: 5px 0;">👑 <strong>Ganó:</strong> ${ganadoresNombres}</p>
-                    <p style="margin: 5px 0; color: #555;">❌ <strong>Perdió:</strong> ${perdedoresNombres}</p>
+                    ${textoPuntos}
+                    <p style="margin: 5px 0; font-size: 14px;">👑 <strong>Ganadores:</strong> ${ganadoresNombres}</p>
+                    <p style="margin: 5px 0; font-size: 14px; color: #555;">❌ <strong>Perdedores:</strong> ${perdedoresNombres}</p>
             `;
 
             if (p.estado === 'pendiente' && firmasFaltantes.length > 0) {
-                html += `<div class="firma-box"><strong style="font-size: 14px; color: #856404;">Falta verificar:</strong>`;
+                html += `<div class="firma-box"><strong style="font-size: 13px; color: #856404;">Firma pendiente:</strong>`;
                 firmasFaltantes.forEach(faltante => {
-                    const nombreFaltante = obtenerNombre(faltante.jugador_id);
                     html += `
                         <div class="firma-row">
-                            <span style="flex: 1; font-weight: bold;">${nombreFaltante}</span>
-                            <input type="password" id="pin-${p.id}-${faltante.jugador_id}" placeholder="PIN" style="width: 80px; padding: 6px;">
-                            <button class="btn-firmar" onclick="firmar('${p.id}', '${faltante.jugador_id}')">Firmar</button>
+                            <span style="flex: 1; font-weight: bold; font-size: 14px;">${obtenerNombre(faltante.jugador_id)}</span>
+                            <input type="password" id="pin-${p.id}-${faltante.jugador_id}" placeholder="PIN" style="width: 70px; padding: 6px; font-size:14px;">
+                            <button class="btn-firmar" onclick="firmar('${p.id}', '${faltante.jugador_id}')">Validar</button>
                         </div>
                     `;
                 });
                 html += `</div>`;
             }
+            
+            html += `<button class="btn-danger" style="margin-top:15px; background: #fff; color: #dc3545; border: 1px solid #dc3545; padding: 6px;" onclick="borrarPartida('${p.id}')">Borrar partida</button>`;
             html += `</div>`;
         });
         divLista.innerHTML = html;
     }
 
-    function obtenerNombre(id) {
-        const j = jugadores.find(j => j.id === id);
-        return j ? j.nombre : 'Desconocido';
-    }
-
     function firmar(partidaId, jugadorId) {
         const pinIngresado = document.getElementById(`pin-${partidaId}-${jugadorId}`).value;
-        const jugador = jugadores.find(j => j.id === jugadorId);
+        const jugador = getJugadores().find(j => j.id === jugadorId);
         
-        if (jugador.pin !== pinIngresado) {
-            alert("PIN incorrecto. Intentá de nuevo.");
-            return;
-        }
+        if (jugador.pin !== pinIngresado) { alert("PIN incorrecto."); return; }
 
-        let partidas = JSON.parse(localStorage.getItem('partidas'));
+        let partidas = getPartidas();
         let partida = partidas.find(p => p.id === partidaId);
         let resultado = partida.resultados.find(r => r.jugador_id === jugadorId);
         resultado.firma_verificada = true;
 
-        const todasFirmadas = partida.resultados.every(r => r.firma_verificada === true);
-        if (todasFirmadas) {
+        if (partida.resultados.every(r => r.firma_verificada === true)) {
             partida.estado = 'oficial';
             alert("¡Firma correcta! La partida ya es OFICIAL.");
         } else {
-            alert("Firma correcta. Faltan los demás.");
+            alert("Firma correcta. Faltan las demás.");
         }
 
-        localStorage.setItem('partidas', JSON.stringify(partidas));
-        cargarPartidas();
+        localStorage.setItem('partidas_v2', JSON.stringify(partidas));
+        cargarFeed();
     }
 
-    iniciarFormulario();
-    cargarPartidas();
+    function borrarPartida(id) {
+        if(confirm("¿Seguro que querés borrar esta partida?")) {
+            let partidas = getPartidas().filter(p => p.id !== id);
+            localStorage.setItem('partidas_v2', JSON.stringify(partidas));
+            cargarFeed();
+        }
+    }
+
+    // 6. SISTEMA DE ESTADÍSTICAS Y COMPARACIÓN
+    function actualizarSelectsComparacion() {
+        const jugadores = getJugadores();
+        let options = '<option value="">Seleccionar...</option>';
+        jugadores.forEach(j => { options += `<option value="${j.id}">${j.nombre}</option>`; });
+        
+        document.getElementById('comp-j1').innerHTML = options;
+        document.getElementById('comp-j2').innerHTML = options;
+    }
+
+    function calcularEstadisticas() {
+        const j1Id = document.getElementById('comp-j1').value;
+        const j2Id = document.getElementById('comp-j2').value;
+        const divRes = document.getElementById('resultados-estadisticas');
+
+        if (!j1Id || !j2Id || j1Id === j2Id) {
+            divRes.innerHTML = "<div class='empty-state'>Seleccioná dos jugadores distintos.</div>";
+            return;
+        }
+
+        const partidas = getPartidas().filter(p => p.estado === 'oficial');
+        
+        let j1Victorias = 0;
+        let j2Victorias = 0;
+        let compartidas = 0;
+
+        partidas.forEach(p => {
+            const resJ1 = p.resultados.find(r => r.jugador_id === j1Id);
+            const resJ2 = p.resultados.find(r => r.jugador_id === j2Id);
+
+            // Si ambos participaron en la partida
+            if (resJ1 && resJ2) {
+                compartidas++;
+                // Enfrentamiento directo (uno ganó, otro perdió)
+                if (resJ1.es_ganador && !resJ2.es_ganador) j1Victorias++;
+                if (resJ2.es_ganador && !resJ1.es_ganador) j2Victorias++;
+            }
+        });
+
+        if (compartidas === 0) {
+            divRes.innerHTML = "<div class='empty-state'>Estos jugadores nunca jugaron una partida oficial juntos.</div>";
+            return;
+        }
+
+        const j1Nombre = obtenerNombre(j1Id);
+        const j2Nombre = obtenerNombre(j2Id);
+
+        divRes.innerHTML = `
+            <div class="stats-box">
+                <p style="margin:0; font-size: 14px; color: #0369a1;">Partidas jugadas juntos</p>
+                <div class="stats-number">${compartidas}</div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div class="stats-box" style="flex: 1; background: #f0fdf4; border-color: #bbf7d0;">
+                    <p style="margin:0; font-size: 14px; color: #166534;">Victorias de ${j1Nombre}</p>
+                    <div class="stats-number" style="color: #15803d;">${j1Victorias}</div>
+                </div>
+                <div class="stats-box" style="flex: 1; background: #fef2f2; border-color: #fecaca;">
+                    <p style="margin:0; font-size: 14px; color: #991b1b;">Victorias de ${j2Nombre}</p>
+                    <div class="stats-number" style="color: #b91c1c;">${j2Victorias}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ARRANQUE
+    actualizarTodosLosSelects();
+    mostrarSeccion('feed');
+
 </script>
 </body>
 </html>
