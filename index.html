@@ -185,7 +185,7 @@
 
 <script>
     // Variables globales
-    let partidaEnEdicion = null; // ID de la partida si estamos editando
+    let partidaEnEdicion = null;
 
     // 1. INICIALIZACIÓN
     if (!localStorage.getItem('jugadores_v2')) { localStorage.setItem('jugadores_v2', JSON.stringify([])); }
@@ -351,7 +351,7 @@
             formato: juego === 'Dudo' ? 'Indefinido' : formato,
             creador_id: creadorId,
             fecha: new Date().toISOString(),
-            estado: 'pendiente', // Si edita, vuelve a pendiente
+            estado: 'pendiente', 
             puntaje_ganador: pGanador,
             puntaje_perdedor: pPerdedor,
             resultados: []
@@ -374,7 +374,6 @@
         mostrarSeccion('feed', '🏆 Historial');
     }
 
-    // Funciones para Editar y Duplicar
     function cargarDatosFormulario(partida, esEdicion) {
         document.getElementById('juego-select').value = partida.juego;
         if(partida.formato && partida.juego !== 'Dudo') document.getElementById('formato-select').value = partida.formato;
@@ -530,7 +529,6 @@
 
         let partidas = getPartidas().filter(p => p.estado === 'oficial');
         
-        // Aplicar filtros
         if (fJuego !== 'Todos') partidas = partidas.filter(p => p.juego === fJuego);
         if (fFormato !== 'Todos') {
             partidas = partidas.filter(p => {
@@ -548,10 +546,9 @@
 
             if (resJ1 && resJ2) {
                 compartidas++;
-                // Lógica clave para Dudo y multijugador: solo suma victoria si J1 gana Y J2 pierde
                 if (resJ1.es_ganador && !resJ2.es_ganador) j1Wins++;
                 else if (resJ2.es_ganador && !resJ1.es_ganador) j2Wins++;
-                else if (!resJ1.es_ganador && !resJ2.es_ganador) otrosWins++; // Ganó un tercero
+                else if (!resJ1.es_ganador && !resJ2.es_ganador) otrosWins++; 
             }
         });
 
