@@ -91,13 +91,8 @@
             </select>
         </div>
 
-        <div class="input-group">
-            <label>Cargado por (Firma automática)</label>
-            <select id="creador-select"></select>
-        </div>
-
         <div class="card" style="border: 2px solid #34c759; box-shadow: none;">
-            <label style="color: #15803d; font-size: 16px;">👑 Ganador/es</label>
+            <label style="color: #15803d; font-size: 16px;">👑 Ganador/es (Firma automática)</label>
             <div id="ganadores-container"></div>
             <div id="puntaje-ganador-container" class="flex-row" style="margin-top: 12px;">
                 <div><label>Puntos Finales</label><input type="number" id="puntaje-ganador" placeholder="Ej: 30"></div>
@@ -105,7 +100,7 @@
         </div>
         
         <div class="card" style="border: 2px solid #ff3b30; box-shadow: none;">
-            <label style="color: #b91c1c; font-size: 16px;">❌ Perdedor/es</label>
+            <label style="color: #b91c1c; font-size: 16px;">❌ Perdedor/es (Deberán firmar)</label>
             <div id="perdedores-container"></div>
             <div id="puntaje-perdedor-container" class="flex-row" style="margin-top: 12px;">
                 <div><label>Puntos Finales</label><input type="number" id="puntaje-perdedor" placeholder="Ej: 23"></div>
@@ -187,12 +182,30 @@
     // Variables globales
     let partidaEnEdicion = null;
 
-    // 1. INICIALIZACIÓN
+    // 1. INICIALIZACIÓN Y MIGRACIÓN
     if (!localStorage.getItem('jugadores_v2')) { localStorage.setItem('jugadores_v2', JSON.stringify([])); }
     if (!localStorage.getItem('partidas_v2')) { localStorage.setItem('partidas_v2', JSON.stringify([])); }
 
     function getJugadores() { return JSON.parse(localStorage.getItem('jugadores_v2')) || []; }
     function getPartidas() { return JSON.parse(localStorage.getItem('partidas_v2')) || []; }
+
+    // Corrección retroactiva de firmas (Solo se ejecuta una vez)
+    function aplicarNuevasReglasDeFirmas() {
+        if (localStorage.getItem('migracion_v3_hecha')) return;
+        
+        let partidas = getPartidas();
+        partidas.forEach(p => {
+            p.resultados.forEach(r => {
+                // Ganadores siempre firmados, perdedores siempre pendientes
+                r.firma_verificada = r.es_ganador ? true : false;
+            });
+            p.estado = p.resultados.every(r => r.firma_verificada) ? 'oficial' : 'pendiente';
+        });
+        
+        localStorage.setItem('partidas_v2', JSON.stringify(partidas));
+        localStorage.setItem('migracion_v3_hecha', 'true');
+    }
+    aplicarNuevasReglasDeFirmas();
 
     // 2. NAVEGACIÓN
     function mostrarSeccion(id, title) {
@@ -210,7 +223,7 @@
         if (id === 'comparar') { actualizarSelectsComparacion(); calcularEstadisticas(); }
     }
 
-    // 3. JUGADORES
+    // 3. JUGADORES Y PIN
     function crearJugador() {
         const nombre = document.getElementById('nuevo-jugador-nombre').value.trim();
         const pin = document.getElementById('nuevo-jugador-pin').value.trim();
@@ -229,7 +242,7 @@
         document.getElementById('nuevo-jugador-pin').value = '';
         
         renderizarListaJugadores();
-        actualizarTodosLosSelects();
+        actualizarSelectsComparacion();
     }
 
     function renderizarListaJugadores() {
@@ -247,29 +260,27 @@
     }
 
     function establecerPin(id) {
+        let jugadores = getJugadores();
+        let j = jugadores.find(x => x.id === id);
+        
+        if (j.pin) {
+            const pinActual = prompt("Por seguridad, ingresá tu PIN actual:");
+            if (pinActual !== null && pinActual !== j.pin) {
+                alert("PIN actual incorrecto. No se puede cambiar.");
+                return;
+            } else if (pinActual === null) {
+                return; // Canceló
+            }
+        }
+
         const nuevoPin = prompt("Ingresá el nuevo PIN (solo números):");
         if (nuevoPin && nuevoPin.length >= 3) {
-            let jugadores = getJugadores();
-            let j = jugadores.find(x => x.id === id);
             j.pin = nuevoPin;
             localStorage.setItem('jugadores_v2', JSON.stringify(jugadores));
             renderizarListaJugadores();
-            alert("PIN guardado.");
+            alert("PIN guardado exitosamente.");
         } else if (nuevoPin !== null) {
             alert("El PIN debe tener al menos 3 caracteres.");
-        }
-    }
-
-    function actualizarTodosLosSelects() {
-        const jugadores = getJugadores();
-        let options = '<option value="">Seleccionar...</option>';
-        jugadores.forEach(j => { options += `<option value="${j.id}">${j.nombre}</option>`; });
-        
-        const creadorSelect = document.getElementById('creador-select');
-        if(creadorSelect) {
-            const val = creadorSelect.value;
-            creadorSelect.innerHTML = options;
-            creadorSelect.value = val;
         }
     }
 
@@ -319,10 +330,7 @@
     function guardarPartida() {
         const juego = document.getElementById('juego-select').value;
         const formato = document.getElementById('formato-select').value;
-        const creadorId = document.getElementById('creador-select').value;
         
-        if(!creadorId) { alert("Elegí quién está cargando la partida."); return; }
-
         let ganadoresIds = []; let perdedoresIds = [];
         let pGanador = null; let pPerdedor = null;
 
@@ -349,24 +357,27 @@
             id: partidaEnEdicion ? partidaEnEdicion : 'p_' + Date.now(),
             juego: juego,
             formato: juego === 'Dudo' ? 'Indefinido' : formato,
-            creador_id: creadorId,
             fecha: new Date().toISOString(),
-            estado: 'pendiente', 
+            estado: 'pendiente', // Por defecto pendiente hasta validar si ya están todos
             puntaje_ganador: pGanador,
             puntaje_perdedor: pPerdedor,
             resultados: []
         };
 
-        ganadoresIds.forEach(id => objetoPartida.resultados.push({ jugador_id: id, es_ganador: true, firma_verificada: (id === creadorId) }));
-        perdedoresIds.forEach(id => objetoPartida.resultados.push({ jugador_id: id, es_ganador: false, firma_verificada: (id === creadorId) }));
+        // Regla estricta: Ganadores = firmados automático. Perdedores = pendientes.
+        ganadoresIds.forEach(id => objetoPartida.resultados.push({ jugador_id: id, es_ganador: true, firma_verificada: true }));
+        perdedoresIds.forEach(id => objetoPartida.resultados.push({ jugador_id: id, es_ganador: false, firma_verificada: false }));
+
+        // Verificar si mágicamente todos están firmados (ej. un juego sin perdedores, poco probable pero por las dudas)
+        objetoPartida.estado = objetoPartida.resultados.every(r => r.firma_verificada) ? 'oficial' : 'pendiente';
 
         if (partidaEnEdicion) {
             const index = partidas.findIndex(p => p.id === partidaEnEdicion);
             partidas[index] = objetoPartida;
-            alert("¡Cambios guardados! Las firmas se reiniciaron.");
+            alert("¡Cambios guardados! Los perdedores deberán volver a firmar.");
         } else {
             partidas.push(objetoPartida);
-            alert("¡Partida registrada!");
+            alert("¡Partida registrada! Los perdedores deben firmar para hacerla oficial.");
         }
 
         localStorage.setItem('partidas_v2', JSON.stringify(partidas));
@@ -377,7 +388,6 @@
     function cargarDatosFormulario(partida, esEdicion) {
         document.getElementById('juego-select').value = partida.juego;
         if(partida.formato && partida.juego !== 'Dudo') document.getElementById('formato-select').value = partida.formato;
-        document.getElementById('creador-select').value = partida.creador_id;
         
         actualizarFormularioJuego(partida.formato, partida.juego === 'Dudo');
 
@@ -502,8 +512,8 @@
 
         if (partida.resultados.every(r => r.firma_verificada === true)) {
             partida.estado = 'oficial';
-            alert("¡Todo firmado! Partida OFICIAL.");
-        } else { alert("Firma OK. Faltan los demás."); }
+            alert("¡Firma exitosa! Todos los perdedores verificaron, la partida ya es OFICIAL.");
+        } else { alert("Firma guardada correctamente. Faltan los demás."); }
 
         localStorage.setItem('partidas_v2', JSON.stringify(partidas));
         cargarFeed();
@@ -577,7 +587,7 @@
     }
 
     // ARRANQUE
-    actualizarTodosLosSelects();
+    actualizarSelectsComparacion();
     mostrarSeccion('feed', '🏆 Historial');
 
 </script>
